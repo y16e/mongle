@@ -39,6 +39,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKScriptMessageHandler
     var tick = 0
     var ready = false
     var lastAutoHour = -1
+    var lastFrames = -1.0
+    var stalls = 0
     let defaults = UserDefaults.standard
 
     var effect: String {
@@ -112,8 +114,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKScriptMessageHandler
         if tick % 2 == 0 { js += "mongleSetWindows(\(windowsJSON()));" }
         web.evaluateJavaScript(js)
 
+        if tick % 300 == 0 {   // watchdog: reload the engine if its animation loop ever stalls
+            web.evaluateJavaScript("T") { [weak self] r, _ in
+                guard let self, let t = r as? Double else { return }
+                self.stalls = t == self.lastFrames ? self.stalls + 1 : 0
+                self.lastFrames = t
+                if self.stalls >= 2 {
+                    self.stalls = 0
+                    self.ready = false
+                    self.web.reload()
+                }
+            }
+        }
         if tick % 600 == 0 {   // every ~10 s, a health line in Console.app
-            web.evaluateJavaScript("[parts.length, wins.length, Math.round(T), wins.reduce((a,w)=>a+w.surface.snow.reduce((x,y)=>x+y,0),0)|0].join(' ')") { [weak self] r, _ in
+            web.evaluateJavaScript("[parts.length, wins.length, Math.round(T), wins.reduce((a,w)=>a+w.surface.snow.reduce((x,y)=>x+y,0),0)|0, document.visibilityState, state.effect, (window.__errs||[]).slice(-3).join(' / ')].join(' ')") { [weak self] r, _ in
                 guard let self else { return }
                 let line = "particles/windows/frames/snowOnWindows = \(r ?? "?")\n"
                 let url = self.wallpaperDir.deletingLastPathComponent().appendingPathComponent("status.txt")

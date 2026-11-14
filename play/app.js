@@ -1,5 +1,7 @@
 /* Mongle — 몽글몽글 데스크탑 날씨 */
 'use strict';
+window.__errs = [];
+addEventListener('error', (e) => window.__errs.push(e.message + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno));
 
 const $ = (s) => document.querySelector(s);
 const rand = (a, b) => a + Math.random() * (b - a);
