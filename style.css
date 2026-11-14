@@ -122,3 +122,9 @@ button.mb-item:hover, button.mb-item.open { background: rgba(255,255,255,.18); }
 }
 #dock button:hover { transform: translateY(-6px) scale(1.08); }
 @media (max-width: 600px) { #dock button { width: 42px; height: 42px; font-size: 22px; } }
+
+/* ---------- inside the Mac app: transparent overlay only ---------- */
+html.native, html.native body { background: transparent; }
+html.native #menubar, html.native #panel, html.native #dock,
+html.native #desktop, html.native #wallpaper { display: none; }
+#piles { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 8999; pointer-events: none; }

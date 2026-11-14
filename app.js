@@ -9,6 +9,9 @@ const DPR = Math.min(window.devicePixelRatio || 1, 2);
 const COL = 3;          // snow heightmap column width (px)
 const MENU_H = 28;
 const MAX_PARTS = 2200;
+// Running inside the Mac app (WKWebView overlay over the real desktop)?
+const NATIVE = !!(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.mongle);
+if (NATIVE) document.documentElement.classList.add('native');
 
 function mulberry32(a) {
   return function () {
@@ -209,9 +212,12 @@ class Surface {
     this.rest = [];
     this.slide = 0; this.spillL = 0; this.spillR = 0; this.shedAcc = 0;
     this.dirty = true; this.z = 0;
-    this.cv = document.createElement('canvas'); this.cv.className = 'pile';
-    this.ctx = this.cv.getContext('2d');
-    host.appendChild(this.cv);
+    this.cv = null;
+    if (host) {
+      this.cv = document.createElement('canvas'); this.cv.className = 'pile';
+      this.ctx = this.cv.getContext('2d');
+      host.appendChild(this.cv);
+    }
   }
   setRect(x, y, w, h) {
     this.x = x; this.y = y; this.h = h;
@@ -220,8 +226,10 @@ class Surface {
       const n = Math.max(1, Math.ceil(w / COL));
       const old = this.snow; this.snow = new Float32Array(n);
       this.snow.set(old.subarray(0, Math.min(n, old.length)));
-      this.cv.width = Math.ceil(w * DPR); this.cv.height = Math.ceil(this.PH * DPR);
-      this.cv.style.width = w + 'px'; this.cv.style.height = this.PH + 'px';
+      if (this.cv) {
+        this.cv.width = Math.ceil(w * DPR); this.cv.height = Math.ceil(this.PH * DPR);
+        this.cv.style.width = w + 'px'; this.cv.style.height = this.PH + 'px';
+      }
       this.dirty = true;
     }
   }
@@ -265,9 +273,14 @@ class Surface {
     if (any) this.dirty = true;
   }
   draw() {
-    const c = this.ctx, h = this.snow, n = h.length, PH = this.PH;
+    if (!this.cv) { this.dirty = false; return; }
+    const c = this.ctx;
     c.setTransform(DPR, 0, 0, DPR, 0, 0);
-    c.clearRect(0, 0, this.w, PH);
+    c.clearRect(0, 0, this.w, this.PH);
+    this.paint(c);
+  }
+  paint(c) {
+    const h = this.snow, n = h.length, PH = this.PH;
     let maxh = 0; for (let i = 0; i < n; i++) if (h[i] > maxh) maxh = h[i];
     if (maxh > .25) {
       c.beginPath(); c.moveTo(0, PH); c.lineTo(0, PH - h[0] * .6);
@@ -350,7 +363,7 @@ function closeWindow(win) {
   }
   for (const r of s.rest) detachRest(s, r, rand(-1.5, 1.5), rand(-2, 0));
   wins.splice(wins.indexOf(win), 1);
-  win.el.remove();
+  if (win.el) win.el.remove();
 }
 
 /* =========================================================
@@ -451,8 +464,11 @@ function updateSurfaces(k) {
       }
     }
   }
-  const dr = $('#dock').getBoundingClientRect();
-  dockSurface.setRect(dr.left, dr.top, dr.width, dr.height);
+  if (NATIVE) dockSurface.setRect(-99999, -99999, 1, 0);
+  else {
+    const dr = $('#dock').getBoundingClientRect();
+    dockSurface.setRect(dr.left, dr.top, dr.width, dr.height);
+  }
   groundSurface.setRect(0, H, W, 0);
 
   for (const s of allSurfaces()) {
@@ -709,7 +725,7 @@ function render() {
   c.globalCompositeOperation = 'source-over';
 
   // lightning
-  if (flash > 0) { c.fillStyle = `rgba(225,232,255,${flash * .32})`; c.fillRect(0, 0, W, H); }
+  if (flash > 0) { c.fillStyle = `rgba(225,232,255,${flash * (NATIVE ? .18 : .32)})`; c.fillRect(0, 0, W, H); }
   if (bolt) {
     c.save();
     c.strokeStyle = `rgba(245,248,255,${bolt.life})`; c.shadowColor = 'rgba(170,200,255,.9)'; c.shadowBlur = 18;
@@ -727,6 +743,7 @@ function render() {
 const wp = $('#wallpaper'), wctx = wp.getContext('2d');
 let currentSceneKey = null;
 function paintWallpaper(force) {
+  if (NATIVE) return;
   const key = resolveScene(state.scene);
   if (!force && key === currentSceneKey) return;
   currentSceneKey = key;
@@ -823,8 +840,8 @@ function tickClock() {
    Dock + starter windows
    ========================================================= */
 const dock = $('#dock');
-const dockSurface = new Surface('dock', dock, 30, 18);
-const groundSurface = new Surface('ground', $('#ground'), 60, 46);
+const dockSurface = new Surface('dock', NATIVE ? null : dock, 30, 18);
+const groundSurface = new Surface('ground', NATIVE ? null : $('#ground'), 60, 46);
 
 const STARTERS = {
   welcome: () => makeWindow({
@@ -883,6 +900,7 @@ function resize() {
 }
 let booted = false;
 function bootWindows() {
+  if (NATIVE) return;
   if (booted || innerWidth < 320 || innerHeight < 320) return; // wait for a real viewport
   booted = true;
   STARTERS.photo(); STARTERS.note(); STARTERS.welcome();
@@ -904,6 +922,83 @@ function frame(now) {
   updateSurfaces(k);
   updateParticles(k);
   render();
+  if (NATIVE) renderPiles();
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+
+/* =========================================================
+   Native bridge (Mac app)
+   The Swift side feeds real window frames + the mouse position.
+   ========================================================= */
+let pctx = null;
+const parked = new Map();   // windows on another Space / minimised keep their snow
+if (NATIVE) {
+  const pc = document.createElement('canvas');
+  pc.id = 'piles';
+  document.body.insertBefore(pc, $('#fx'));
+  pctx = pc.getContext('2d');
+  const sizePiles = () => { pc.width = W * DPR; pc.height = H * DPR; };
+  addEventListener('resize', sizePiles); sizePiles();
+}
+
+function renderPiles() {
+  const c = pctx;
+  c.setTransform(DPR, 0, 0, DPR, 0, 0);
+  c.clearRect(0, 0, W, H);
+  const g = groundSurface;
+  c.save(); c.translate(0, H - g.PH); g.paint(c); c.restore();
+  // paint back-to-front; each window erases whatever lower piles it covers
+  const sorted = [...wins].sort((a, b) => a.surface.z - b.surface.z);
+  for (const w of sorted) {
+    const s = w.surface;
+    c.clearRect(s.x, s.y, s.w, s.h);
+    c.save(); c.translate(s.x, s.y - s.PH); s.paint(c); c.restore();
+  }
+}
+
+// list: front-to-back [{id, x, y, w, h}] in page coordinates
+window.mongleSetWindows = (list) => {
+  const seen = new Set();
+  list.forEach((r, i) => {
+    seen.add(r.id);
+    let w = wins.find((x) => x.id === r.id);
+    if (!w) {
+      w = parked.get(r.id);
+      if (w) parked.delete(r.id);
+      else {
+        w = { kind: 'native', id: r.id, x: r.x, y: r.y, w: r.w, h: r.h, surface: new Surface('win', null, 40, 26) };
+        w.surface.setRect(r.x, r.y, r.w, r.h);
+      }
+      w.surface.px = r.x; w.surface.py = r.y; w.surface.vx = w.surface.vy = 0;
+      wins.push(w);
+    }
+    w.x = r.x; w.y = r.y; w.w = r.w; w.h = r.h;
+    w.surface.z = list.length - i;
+  });
+  for (let i = wins.length - 1; i >= 0; i--) {
+    const w = wins[i];
+    if (!seen.has(w.id)) { wins.splice(i, 1); parked.set(w.id, w); }
+  }
+  if (parked.size > 120) parked.delete(parked.keys().next().value);
+};
+
+window.mongleSetPointer = (x, y) => {
+  if (x !== pointer.x || y !== pointer.y) pointer.lastMove = performance.now();
+  pointer.x = x; pointer.y = y; pointer.inside = true;
+};
+
+window.mongleApply = (opts) => {
+  if (opts.intensity) { state.intensity = opts.intensity; save(); }
+  if (opts.effect) setEffect(opts.effect);
+  if (opts.clear) $('#clear-all').click();
+};
+
+// returns a PNG data URL of a scene at the given pixel size
+window.mongleRenderWallpaper = (key, w, h) => {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  drawScene(cv.getContext('2d'), w, h, resolveScene(key));
+  return cv.toDataURL('image/png');
+};
+
+if (NATIVE) window.webkit.messageHandlers.mongle.postMessage({ type: 'ready' });
