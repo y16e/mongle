@@ -131,3 +131,14 @@ code { font: 13px ui-monospace, Menlo, monospace; background: rgba(27,29,51,.06)
 @media (min-width: 1120px) { .final { width: calc(100% - 40px); } }
 
 footer { text-align: center; padding: 40px 20px 50px; color: var(--muted); font-size: 14px; }
+
+.play-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 34px; }
+@media (max-width: 860px) { .play-grid { grid-template-columns: 1fr; } }
+.play-card {
+  text-decoration: none; background: linear-gradient(170deg, #ffffff, #eef2ff); border: 1px solid var(--line);
+  border-radius: 22px; padding: 26px; transition: transform .2s; box-shadow: 0 8px 24px rgba(27,29,51,.06);
+}
+.play-card:hover { transform: translateY(-4px); }
+.play-card .big { font-size: 44px; display: block; }
+.play-card h3 { margin: 12px 0 6px; font-size: 20px; }
+.play-card p { margin: 0; color: #555872; line-height: 1.65; font-size: 15px; }

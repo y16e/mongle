@@ -577,6 +577,7 @@ function render() {
     bolt.branches.forEach((b) => line(b, 1.2));
     c.restore();
   }
+  if (typeof toolsRender === 'function') toolsRender(c);
 }
 
 /* =========================================================
@@ -664,7 +665,7 @@ addEventListener('keydown', (e) => {
   if (n >= 1 && n <= 6) setEffect(EFFECTS[n - 1].key);
   else if (e.key === '0') setEffect('pause');
   else if (e.key === 'n' || e.key === 'N') addRandomWindow();
-  else if (e.key === 'Escape') togglePanel(false);
+  else if (e.key === 'Escape' && !panel.hidden) togglePanel(false);
 });
 
 addEventListener('pointermove', (e) => {
@@ -763,6 +764,7 @@ function frame(now) {
   if (state.effect !== 'pause') spawn(k); else spawn(0);
   updateSurfaces(k);
   updateParticles(k);
+  if (typeof toolsUpdate === 'function') toolsUpdate(k);
   render();
   if (NATIVE) renderPiles();
   requestAnimationFrame(frame);
@@ -790,12 +792,14 @@ function renderPiles() {
   c.clearRect(0, 0, W, H);
   const g = groundSurface;
   c.save(); c.translate(0, H - g.PH); g.paint(c); c.restore();
+  toolsPaintSurface(c, g);
   // paint back-to-front; each window erases whatever lower piles it covers
   const sorted = [...wins].sort((a, b) => a.surface.z - b.surface.z);
   for (const w of sorted) {
     const s = w.surface;
     c.clearRect(s.x, s.y, s.w, s.h);
     c.save(); c.translate(s.x, s.y - s.PH); s.paint(c); c.restore();
+    toolsPaintSurface(c, s);
   }
 }
 
@@ -834,6 +838,7 @@ window.mongleApply = (opts) => {
   if (opts.intensity) { state.intensity = opts.intensity; save(); }
   if (opts.effect) setEffect(opts.effect);
   if (opts.clear) $('#clear-all').click();
+  if (opts.tool && window.setTool) window.setTool(opts.tool);
 };
 
 // returns a PNG data URL of a scene at the given pixel size

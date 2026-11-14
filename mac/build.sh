@@ -15,7 +15,7 @@ xcrun swiftc -O -swift-version 5 -target "$(uname -m)-apple-macos13.0" \
 
 echo "▸ copying resources"
 cp mac/Info.plist "$APP/Contents/Info.plist"
-cp play/index.html play/scenes.js play/app.js play/style.css "$APP/Contents/Resources/web/"
+cp play/index.html play/scenes.js play/app.js play/tools.js play/style.css "$APP/Contents/Resources/web/"
 
 echo "▸ icon"
 TMP="$(mktemp -d)"

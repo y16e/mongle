@@ -7,8 +7,13 @@ import WebKit
 import ServiceManagement
 
 final class OverlayWindow: NSWindow {
-    override var canBecomeKey: Bool { false }
+    var interactive = false
+    override var canBecomeKey: Bool { interactive }
     override var canBecomeMain: Bool { false }
+}
+
+final class OverlayWebView: WKWebView {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 }
 
 let EFFECTS: [(key: String, name: String, symbol: String)] = [
@@ -20,6 +25,9 @@ let SCENES: [(key: String, name: String)] = [
     ("auto", "자동 (시간대에 맞춰)"), ("dawn", "새벽"), ("sunrise", "일출"), ("morning", "아침"),
     ("noon", "한낮"), ("golden", "골든 아워"), ("sunset", "일몰"), ("dusk", "해 질 녘"), ("night", "밤"),
     ("winter", "겨울"), ("rain", "비"), ("stars", "별"), ("fireflies", "반딧불이"), ("autumn", "가을"), ("spring", "봄"),
+]
+let PLAY_TOOLS: [(key: String, name: String)] = [
+    ("broom", "🧹  빗자루로 눈 쓸기"), ("plow", "🚜  제설차 출동"), ("ball", "⛄  눈사람 만들기"),
 ]
 let LEVELS: [(value: Double, name: String)] = [(0.5, "살살"), (1.0, "보통"), (1.6, "펑펑"), (2.0, "폭설급")]
 
@@ -72,7 +80,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKScriptMessageHandler
 
         let config = WKWebViewConfiguration()
         config.userContentController.add(self, name: "mongle")
-        web = WKWebView(frame: window.contentView!.bounds, configuration: config)
+        web = OverlayWebView(frame: window.contentView!.bounds, configuration: config)
         web.autoresizingMask = [.width, .height]
         web.setValue(false, forKey: "drawsBackground")
         window.contentView!.addSubview(web)
@@ -87,7 +95,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKScriptMessageHandler
     }
 
     func userContentController(_ uc: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard let body = message.body as? [String: Any], body["type"] as? String == "ready" else { return }
+        guard let body = message.body as? [String: Any] else { return }
+        if body["type"] as? String == "tool", let t = body["tool"] as? String { setInteractive(t); return }
+        guard body["type"] as? String == "ready" else { return }
         ready = true
         NSLog("Mongle: engine ready")
         web.evaluateJavaScript("mongleApply({effect: '\(effect)', intensity: \(intensity)})")
@@ -134,6 +144,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKScriptMessageHandler
                               id, r.minX, r.minY, r.width, r.height))
         }
         return "[" + out.joined(separator: ",") + "]"
+    }
+
+    // MARK: snow play (overlay takes the mouse while a tool is active)
+
+    var currentTool = "hand"
+
+    func setInteractive(_ tool: String) {
+        currentTool = tool
+        let on = tool != "hand"
+        window.interactive = on
+        window.ignoresMouseEvents = !on
+        if on {
+            NSApp.activate(ignoringOtherApps: true)
+            window.makeKeyAndOrderFront(nil)
+        } else {
+            window.resignKey()
+            NSApp.deactivate()
+            window.orderFrontRegardless()
+        }
+        rebuildMenu()
+    }
+
+    @objc func pickTool(_ sender: NSMenuItem) {
+        guard let key = sender.representedObject as? String else { return }
+        let t = key == currentTool ? "hand" : key
+        web.evaluateJavaScript("mongleApply({tool: '\(t)'})")
+        setInteractive(t)
     }
 
     // MARK: menu bar
@@ -195,6 +232,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKScriptMessageHandler
         let wpItem = NSMenuItem(title: "배경화면", action: nil, keyEquivalent: "")
         wpItem.submenu = wpMenu
         menu.addItem(wpItem)
+
+        let playHeader = NSMenuItem(title: "눈놀이", action: nil, keyEquivalent: "")
+        playHeader.isEnabled = false
+        menu.addItem(playHeader)
+        for t in PLAY_TOOLS {
+            let item = NSMenuItem(title: t.name, action: #selector(pickTool(_:)), keyEquivalent: "")
+            item.representedObject = t.key
+            item.target = self
+            item.state = t.key == currentTool ? .on : .off
+            menu.addItem(item)
+        }
+        if currentTool != "hand" {
+            let stop = NSMenuItem(title: "✓  다 놀았어요 (Esc)", action: #selector(pickTool(_:)), keyEquivalent: "")
+            stop.representedObject = currentTool
+            stop.target = self
+            menu.addItem(stop)
+        }
+        menu.addItem(.separator())
 
         let clear = NSMenuItem(title: "쌓인 것 모두 치우기", action: #selector(clearAll), keyEquivalent: "k")
         clear.target = self

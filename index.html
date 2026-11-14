@@ -17,6 +17,7 @@
     <a class="brand" href="#top"><img src="assets/icon.png" alt="" width="30" height="30" />Mongle</a>
     <div class="nav-links">
       <a href="#effects">효과</a>
+      <a href="#snowplay">눈놀이</a>
       <a href="#wallpapers">배경화면</a>
       <a href="#install">설치</a>
       <a href="#faq">자주 묻는 질문</a>
@@ -52,6 +53,15 @@
     <div class="fx-grid" id="fx-grid"></div>
   </section>
 
+  <section id="snowplay" class="section">
+    <h2>눈이 쌓이면,<br /><span class="muted">놀아야죠.</span></h2>
+    <div class="play-grid">
+      <a class="play-card" href="play/?fx=snow&amp;scene=winter"><span class="big">🧹</span><h3>빗자루</h3><p>창 위에 쌓인 눈을 꾹 누른 채로 쓱쓱. 쓸린 눈이 포슬포슬 날아가요.</p></a>
+      <a class="play-card" href="play/?fx=snow&amp;scene=winter"><span class="big">🚜</span><h3>제설차</h3><p>창 위나 바닥을 누르면 제설차가 출동해서 눈을 밀고 가장자리로 와르르 쏟아요.</p></a>
+      <a class="play-card" href="play/?fx=snow&amp;scene=winter"><span class="big">☃️</span><h3>눈사람</h3><p>눈을 굴려 눈덩이를 키우고, 집어서 쌓으면 눈사람 완성. 세 개를 쌓으면 모자도 씌워 줘요.</p></a>
+    </div>
+  </section>
+
   <section id="wallpapers" class="section">
     <h2>어울리는 배경화면.<br /><span class="muted">메뉴에서 한 번 누르면 바탕화면이 바뀌어요.</span></h2>
     <p class="sub">'자동'으로 두면 새벽부터 밤까지 시간에 맞춰 하늘이 바뀌어요. 모두 코드로 그려서 어떤 해상도에서도 선명해요.</p>
@@ -74,7 +84,7 @@
       <li>
         <span class="num">3</span>
         <h3>날씨 고르기</h3>
-        <p>화면 맨 위 메뉴 막대의 <b>☁︎ 구름</b>을 눌러 날씨, 세기, 배경화면을 고르세요. 그다음부터는 알아서 내려요.</p>
+        <p>화면 맨 위 메뉴 막대의 <b>☁︎ 구름</b>을 눌러 날씨, 세기, 배경화면을 고르세요. 눈이 쌓이면 메뉴의 <b>눈놀이</b>에서 빗자루, 제설차, 눈사람을 꺼내 보세요.</p>
       </li>
     </ol>
   </section>
@@ -83,7 +93,7 @@
     <h2>알아 두면<br /><span class="muted">좋은 것들.</span></h2>
     <div class="faq">
       <details><summary>정말 무료예요?</summary><p>네, 전부 무료예요. 구독도 광고도 없어요. 코드도 <a href="https://github.com/y16e/mongle">GitHub</a>에 공개되어 있어요.</p></details>
-      <details><summary>클릭이 막히지 않나요?</summary><p>날씨는 투명한 막 위에 그려지고, 클릭은 그대로 아래로 통과해요. 평소처럼 컴퓨터를 쓰면 돼요.</p></details>
+      <details><summary>클릭이 막히지 않나요?</summary><p>날씨는 투명한 막 위에 그려지고, 클릭은 그대로 아래로 통과해요. 눈놀이 도구를 들고 있는 동안만 마우스가 눈놀이에 쓰이고, <b>✓ 다 놀았어요</b>나 <b>Esc</b>를 누르면 원래대로 돌아와요.</p></details>
       <details><summary>Mac이 느려지나요?</summary><p>가볍게 만들었어요. 그래도 신경 쓰이면 메뉴에서 세기를 '살살'로 낮추거나 '일시 정지'를 고르세요.</p></details>
       <details><summary>"손상되었기 때문에 열 수 없습니다"라고 나와요.</summary><p>Apple 공증을 받지 않은 앱이라 그래요. <b>시스템 설정 → 개인정보 보호 및 보안</b>에서 <b>그래도 열기</b>를 누르세요. 그래도 안 되면 터미널에서 <code>xattr -cr /Applications/Mongle.app</code>을 한 번 실행한 뒤 다시 열어 보세요.</p></details>
       <details><summary>원래 배경화면으로 돌아갈 수 있나요?</summary><p>그럼요. 메뉴 → 배경화면 → <b>원래 배경화면으로 되돌리기</b>를 누르면 처음 쓰던 배경화면으로 돌아가요.</p></details>
