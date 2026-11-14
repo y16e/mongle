@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Mongle — 내 화면에 몽글몽글 날씨</title>
+  <meta name="description" content="창 위에 쌓이는 눈, 포인터로 쓸리는 낙엽, 부서지는 별똥별. 브라우저에서 바로 즐기는 데스크탑 날씨." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="wallpaper"></canvas>
+  <div id="desktop">
+    <div id="ground"></div>
+  </div>
+
+  <div id="dock"></div>
+
+  <canvas id="fx"></canvas>
+
+  <header id="menubar">
+    <button id="logo" class="mb-item mb-strong" aria-haspopup="true">☁︎ Mongle</button>
+    <span class="mb-item mb-dim">파일</span>
+    <span class="mb-item mb-dim">편집</span>
+    <span class="mb-item mb-dim">보기</span>
+    <div class="mb-spacer"></div>
+    <button id="mb-effect" class="mb-item" title="날씨 바꾸기"></button>
+    <span id="clock" class="mb-item"></span>
+  </header>
+
+  <section id="panel" hidden>
+    <h3>날씨</h3>
+    <div id="effects" class="grid-effects"></div>
+    <h3>배경화면</h3>
+    <div id="scenes" class="grid-scenes"></div>
+    <h3>세기</h3>
+    <input id="intensity" type="range" min="0.3" max="2" step="0.1" value="1" />
+    <div class="panel-actions">
+      <button id="add-win">창 추가</button>
+      <button id="clear-all">모두 치우기</button>
+    </div>
+    <p class="hint">단축키: 1–6 효과 · 0 일시 정지 · N 창 추가</p>
+  </section>
+
+  <script src="scenes.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -33,7 +33,9 @@ Xcode Command Line Tools(`xcode-select --install`)가 필요해요. macOS 13 이
 python3 -m http.server 5178
 ```
 
-그다음 http://localhost:5178 을 여세요.
+그다음 http://localhost:5178 을 여세요. 소개 사이트는 `/`, 웹 데모는 `/play/`에 있어요.
+
+배포된 사이트: https://y16e.github.io/mongle/
 
 ## 단축키
 
