@@ -140,3 +140,14 @@ order.forEach((k) => {
   a.appendChild(s);
   grid.appendChild(a);
 });
+
+/* copy the install command */
+document.getElementById('copy-cmd').addEventListener('click', async (e) => {
+  const text = document.getElementById('install-cmd').textContent;
+  try { await navigator.clipboard.writeText(text); } catch {
+    const r = document.createRange(); r.selectNodeContents(document.getElementById('install-cmd'));
+    getSelection().removeAllRanges(); getSelection().addRange(r); document.execCommand('copy');
+  }
+  e.target.textContent = '복사됨 ✓';
+  setTimeout(() => { e.target.textContent = '복사'; }, 1800);
+});

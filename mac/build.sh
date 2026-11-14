@@ -9,9 +9,15 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/web"
 
 echo "▸ compiling"
-xcrun swiftc -O -swift-version 5 -target "$(uname -m)-apple-macos13.0" \
-  -o "$APP/Contents/MacOS/Mongle" mac/main.swift \
-  -framework Cocoa -framework WebKit -framework ServiceManagement
+# universal binary: Apple Silicon + Intel
+BIN="$(mktemp -d)"
+for arch in arm64 x86_64; do
+  xcrun swiftc -O -swift-version 5 -target "$arch-apple-macos13.0" \
+    -o "$BIN/Mongle-$arch" mac/main.swift \
+    -framework Cocoa -framework WebKit -framework ServiceManagement
+done
+lipo -create "$BIN/Mongle-arm64" "$BIN/Mongle-x86_64" -output "$APP/Contents/MacOS/Mongle"
+rm -rf "$BIN"
 
 echo "▸ copying resources"
 cp mac/Info.plist "$APP/Contents/Info.plist"

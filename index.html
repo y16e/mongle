@@ -22,7 +22,7 @@
       <a href="#install">설치</a>
       <a href="#faq">자주 묻는 질문</a>
     </div>
-    <a class="nav-cta" href="https://github.com/y16e/mongle/releases/latest/download/Mongle-mac.zip">다운로드</a>
+    <a class="nav-cta" href="#install">설치하기</a>
   </nav>
 
   <header class="hero" id="top">
@@ -31,16 +31,16 @@
     <p class="lead">창 위에 눈이 소복이 쌓이고, 창을 휙 던지면 눈이 흩날려요.<br class="br-wide" />
       낙엽은 포인터로 쓸고, 반딧불이는 포인터 곁으로 모여요.</p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="https://github.com/y16e/mongle/releases/latest/download/Mongle-mac.zip">
+      <a class="btn btn-primary" href="#install">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M16.4 12.6c0-2.4 2-3.6 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.3 1.2 9.7.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.5 0 1.9.8 3.2.8 1.3 0 2.1-1.2 2.9-2.4.9-1.3 1.3-2.7 1.3-2.8-.1 0-2.4-.9-2.4-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z"/></svg>
-        <span><small>무료 다운로드</small>Mac</span>
+        <span><small>무료 설치</small>Mac</span>
       </a>
       <a class="btn btn-ghost" href="play/">
         <span class="emoji">🌨️</span>
         <span><small>설치 없이</small>브라우저에서 해 보기</span>
       </a>
     </div>
-    <p class="meta">macOS 13 이상 · Apple Silicon / Intel · 구독 없음, 광고 없음</p>
+    <p class="meta">macOS 13 이상 · Apple Silicon / Intel 모두 지원 · 구독 없음, 광고 없음</p>
 
     <div class="demo">
       <iframe src="play/?fx=snow&amp;scene=winter" title="Mongle 데모" loading="eager"></iframe>
@@ -69,24 +69,40 @@
   </section>
 
   <section id="install" class="section">
-    <h2>1분이면 끝.<br /><span class="muted">세 단계면 돼요.</span></h2>
+    <h2>1분이면 끝.<br /><span class="muted">한 줄이면 돼요.</span></h2>
     <ol class="steps">
       <li>
         <span class="num">1</span>
-        <h3>내려받고 옮기기</h3>
-        <p><a href="https://github.com/y16e/mongle/releases/latest/download/Mongle-mac.zip">Mongle-mac.zip</a>을 내려받아 풀고, <b>Mongle</b>을 <b>응용 프로그램</b> 폴더로 끌어다 놓으세요.</p>
+        <h3>터미널 열기</h3>
+        <p><kbd>⌘ Command</kbd> + <kbd>Space</kbd>를 누르고 <b>터미널</b>이라고 입력한 다음 <kbd>Enter</kbd>를 누르세요.</p>
       </li>
       <li>
         <span class="num">2</span>
-        <h3>처음 한 번만 허용하기</h3>
-        <p>Mongle을 열면 "확인되지 않은 개발자" 안내가 나와요. <b>시스템 설정 → 개인정보 보호 및 보안</b> 맨 아래에서 <b>그래도 열기</b>를 누르세요.</p>
+        <h3>한 줄 붙여 넣기</h3>
+        <p>아래 명령을 복사해서 터미널에 붙여 넣고 <kbd>Enter</kbd>를 누르세요. 내려받고, 응용 프로그램 폴더에 넣고, 실행까지 알아서 해요.</p>
       </li>
       <li>
         <span class="num">3</span>
         <h3>날씨 고르기</h3>
-        <p>화면 맨 위 메뉴 막대의 <b>☁︎ 구름</b>을 눌러 날씨, 세기, 배경화면을 고르세요. 눈이 쌓이면 메뉴의 <b>눈놀이</b>에서 빗자루, 제설차, 눈사람을 꺼내 보세요.</p>
+        <p>화면 맨 위 메뉴 막대의 <b>☁︎ 구름</b>을 눌러 날씨와 배경화면을 고르세요. 눈이 쌓이면 <b>눈놀이</b>에서 빗자루, 제설차, 눈사람을 꺼내 보세요.</p>
       </li>
     </ol>
+    <div class="cmd">
+      <code id="install-cmd">curl -fsSL https://y16e.github.io/mongle/install.sh | bash</code>
+      <button id="copy-cmd" type="button">복사</button>
+    </div>
+    <p class="cmd-note">설치 스크립트가 하는 일이 궁금하면 <a href="install.sh">install.sh</a>에서 전부 볼 수 있어요.</p>
+
+    <details class="manual">
+      <summary>터미널이 낯설다면: 직접 내려받아 설치하기</summary>
+      <ol>
+        <li><a href="https://github.com/y16e/mongle/releases/latest/download/Mongle-mac.zip">Mongle-mac.zip</a>을 내려받아 열고, 나온 <b>Mongle</b>을 <b>응용 프로그램</b> 폴더로 끌어다 놓으세요.</li>
+        <li>Mongle을 열면 "Apple이 악성 코드가 없음을 확인할 수 없습니다"라는 창이 떠요. 당황하지 말고 <b>완료</b>를 누르세요.</li>
+        <li> <b>시스템 설정 → 개인정보 보호 및 보안</b>을 열고 맨 아래로 내리세요. "Mongle이(가) 차단되었습니다" 옆의 <b>그래도 열기</b>를 누르세요.</li>
+        <li>Mac 암호를 넣고, 한 번 더 <b>그래도 열기</b>를 누르면 끝이에요. 다음부터는 그냥 열려요.</li>
+      </ol>
+      <p class="why">왜 이런 창이 뜨나요? Mongle은 Apple의 유료 개발자 공증을 아직 받지 않은 무료 앱이라서, macOS가 처음 한 번 확인을 받아요. 코드는 <a href="https://github.com/y16e/mongle">GitHub</a>에 모두 공개되어 있어요.</p>
+    </details>
   </section>
 
   <section id="faq" class="section">
@@ -95,7 +111,7 @@
       <details><summary>정말 무료예요?</summary><p>네, 전부 무료예요. 구독도 광고도 없어요. 코드도 <a href="https://github.com/y16e/mongle">GitHub</a>에 공개되어 있어요.</p></details>
       <details><summary>클릭이 막히지 않나요?</summary><p>날씨는 투명한 막 위에 그려지고, 클릭은 그대로 아래로 통과해요. 눈놀이 도구를 들고 있는 동안만 마우스가 눈놀이에 쓰이고, <b>✓ 다 놀았어요</b>나 <b>Esc</b>를 누르면 원래대로 돌아와요.</p></details>
       <details><summary>Mac이 느려지나요?</summary><p>가볍게 만들었어요. 그래도 신경 쓰이면 메뉴에서 세기를 '살살'로 낮추거나 '일시 정지'를 고르세요.</p></details>
-      <details><summary>"손상되었기 때문에 열 수 없습니다"라고 나와요.</summary><p>Apple 공증을 받지 않은 앱이라 그래요. <b>시스템 설정 → 개인정보 보호 및 보안</b>에서 <b>그래도 열기</b>를 누르세요. 그래도 안 되면 터미널에서 <code>xattr -cr /Applications/Mongle.app</code>을 한 번 실행한 뒤 다시 열어 보세요.</p></details>
+      <details><summary>"악성 코드가 없음을 확인할 수 없습니다" / "손상되었습니다"라고 나와요.</summary><p>공증을 받지 않은 앱을 브라우저로 내려받으면 나오는 안내예요. <a href="#install">설치 방법</a>의 한 줄 명령으로 설치하면 이 창 없이 바로 열려요. 이미 내려받았다면 <b>시스템 설정 → 개인정보 보호 및 보안 → 그래도 열기</b>를 누르세요.</p></details>
       <details><summary>원래 배경화면으로 돌아갈 수 있나요?</summary><p>그럼요. 메뉴 → 배경화면 → <b>원래 배경화면으로 되돌리기</b>를 누르면 처음 쓰던 배경화면으로 돌아가요.</p></details>
       <details><summary>컴퓨터를 켤 때 자동으로 켜지게 할 수 있나요?</summary><p>메뉴에서 <b>로그인할 때 자동 실행</b>을 켜 두세요.</p></details>
       <details><summary>모니터가 여러 대예요.</summary><p>지금은 메뉴 막대가 있는 메인 화면에 날씨가 내려요. 배경화면은 모든 화면에 바뀌어요.</p></details>
@@ -105,7 +121,7 @@
 
   <section class="final">
     <h2>오늘 날씨는<br />내가 정해요.</h2>
-    <a class="btn btn-primary btn-lg" href="https://github.com/y16e/mongle/releases/latest/download/Mongle-mac.zip"><span><small>무료 다운로드</small>Mac용 Mongle</span></a>
+    <a class="btn btn-primary btn-lg" href="#install"><span><small>무료 설치</small>Mac용 Mongle</span></a>
   </section>
 
   <footer>

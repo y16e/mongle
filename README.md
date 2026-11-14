@@ -21,6 +21,14 @@
 진짜 바탕화면 위에서 돌아가는 메뉴 막대 앱이에요. 실제 창 위에 눈이 쌓이고, 창을 끌면 떨어져요.
 클릭은 그대로 통과해서 평소처럼 컴퓨터를 쓸 수 있어요.
 
+**설치 (한 줄):**
+
+```bash
+curl -fsSL https://y16e.github.io/mongle/install.sh | bash
+```
+
+직접 빌드하려면:
+
 ```bash
 ./mac/build.sh
 cp -R build/Mongle.app /Applications/
